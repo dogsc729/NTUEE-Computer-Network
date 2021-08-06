@@ -1,0 +1,34 @@
+1 package main
+2 
+3 import (
+4 	"bufio"
+5 	"fmt"
+6 	"net"
+7 )
+8 
+9 func check(e error) {
+10 	if e != nil {
+11 		panic(e)
+12 	}
+13 }
+14 
+15 func main() {
+16 	fmt.Println("Launching server...")
+17 	ln, _ := net.Listen("tcp", ":12018") //socket handle, works just like a file handler or the standard I/O
+18 	conn, _ := ln.Accept()               //socket, dedicated to data transmission between the client and server
+19 	defer ln.Close()
+20 	defer conn.Close()
+21 
+22 	scanner := bufio.NewScanner(conn)
+23 	message := ""
+24 	if scanner.Scan() {
+25 		message = scanner.Text()
+26 		fmt.Println(message)
+27 	}
+28 
+29 	writer := bufio.NewWriter(conn)
+30 	newline := fmt.Sprintf("%d bytes received\n", len(message))
+31 	_, errw := writer.WriteString(newline)
+32 	check(errw)
+33 	writer.Flush()
+34 }
